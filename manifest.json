@@ -1,0 +1,22 @@
+{
+  "name": "ECOTrack: Registra tus Hábitos",
+  "short_name": "ECOTrack",
+  "description": "Una aplicación para registrar tus hábitos ecológicos y ayudar al planeta.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F9FAFB",
+  "theme_color": "#10B981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-128x128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
