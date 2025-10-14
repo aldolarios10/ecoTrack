@@ -4,6 +4,7 @@
   "description": "Una aplicación para registrar tus hábitos ecológicos y ayudar al planeta.",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "background_color": "#F9FAFB",
   "theme_color": "#10B981",
   "orientation": "portrait-primary",

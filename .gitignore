@@ -1,0 +1,3 @@
+.venv/
+ecotrack.db
+__pycache__/
