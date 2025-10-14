@@ -1,0 +1,198 @@
+:root {
+    --color-primary: #10B981; /* Esmeralda 500 */
+    --color-secondary: #059669; /* Esmeralda 600 */
+    --color-background: #F9FAFB; /* Gris claro */
+}
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-background);
+    transition: all 0.3s ease;
+}
+/* Estilos base del sidebar, se oculta en mobile por JS/Tailwind */
+.sidebar {
+    width: 280px;
+    background: #ffffff;
+    border-right: 1px solid #E5E7EB;
+}
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+.main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s;
+}
+.btn-primary:hover {
+    background-color: var(--color-secondary);
+}
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: #4B5563; /* Gris 600 */
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.nav-item.active {
+    background-color: #D1FAE5; /* Esmeralda 100 */
+    color: var(--color-secondary);
+    font-weight: 600;
+}
+.nav-item:hover {
+    background-color: #F3F4F6; /* Gris 100 */
+}
+/* Estilos para la tabla del ranking */
+.ranking-table th, .ranking-table td {
+    padding: 1rem 1.5rem;
+}
+.ranking-table th {
+    text-align: left;
+    font-weight: 600;
+    color: #4B5563;
+}
+.ranking-table tbody tr:nth-child(even) {
+    background-color: #F9FAFB;
+}
+.ranking-table tbody tr:hover {
+    background-color: #F3F4F6;
+}
+.gold { background-color: #FFD700; color: #374151; font-weight: 700; }
+.silver { background-color: #C0C0C0; color: #374151; }
+.bronze { background-color: #CD7F32; color: #374151; }
+
+/* Custom Title Bar Styles */
+.custom-title-bar {
+    position: fixed;
+    top: env(titlebar-area-y, 0);
+    left: env(titlebar-area-x, 0);
+    width: env(titlebar-area-width, 100%);
+    height: env(titlebar-area-height, 40px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+    transition: opacity 0.3s ease;
+}
+
+.custom-title-bar.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.title-bar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: none;
+}
+
+.title-bar-left,
+.title-bar-center,
+.title-bar-right {
+    display: flex;
+    align-items: center;
+}
+
+.title-bar-center {
+    flex: 1;
+    justify-content: center;
+}
+
+.title-bar-right {
+    justify-content: flex-end;
+}
+
+.title-bar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #4B5563;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.title-bar-btn:hover {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+}
+
+.title-bar-btn:active {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.close-btn:hover {
+    background: #EF4444;
+    color: white;
+}
+
+.app-title {
+    font-weight: 600;
+    color: #10B981;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    border: 1px solid #E5E7EB;
+}
+
+.dropdown-menu a {
+    text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .custom-title-bar {
+        padding: 0 8px;
+    }
+
+    .title-bar-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .app-title {
+        font-size: 12px;
+    }
+}
+
+/* Ensure app content doesn't overlap title bar */
+.dashboard-layout {
+    padding-top: env(titlebar-area-height, 40px);
+}
+
+body {
+    padding-top: env(titlebar-area-height, 40px);
+}
