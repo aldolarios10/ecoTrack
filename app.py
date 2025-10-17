@@ -12,10 +12,20 @@ CORS(app)  # Habilitamos CORS para permitir peticiones desde el frontend
 app.register_blueprint(api_bp)
 app.register_blueprint(static_bp)
 
-# Inicializar base de datos
-with app.app_context():
-    init_db()
-    init_challenges()
+# Inicializar base de datos solo en desarrollo local
+if __name__ == '__main__':
+    with app.app_context():
+        init_db()
+        init_challenges()
+
+# For Vercel serverless functions, initialize DB on first request
+@app.before_request
+def initialize_database():
+    if not hasattr(app, 'db_initialized'):
+        with app.app_context():
+            init_db()
+            init_challenges()
+        app.db_initialized = True
 
 # --- Ejecución de la aplicación ---
 if __name__ == '__main__':
@@ -24,8 +34,5 @@ if __name__ == '__main__':
 
 # Vercel serverless function handler
 def handler(request):
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
-    from werkzeug.serving import run_simple
-
-    # For Vercel deployment
-    return app
+    # For Vercel deployment - return the Flask WSGI app
+    return app.wsgi_app
