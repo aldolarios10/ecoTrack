@@ -21,3 +21,11 @@ with app.app_context():
 if __name__ == '__main__':
     print(f"Backend Flask iniciado. Accede a http://127.0.0.1:5000/")
     app.run(debug=True)
+
+# Vercel serverless function handler
+def handler(request):
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from werkzeug.serving import run_simple
+
+    # For Vercel deployment
+    return app
