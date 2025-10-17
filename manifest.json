@@ -19,5 +19,31 @@
       "type": "image/png",
       "sizes": "512x512"
     }
+  ],
+  "widgets": [
+    {
+      "name": "ECOTrack Widget",
+      "description": "Track your eco-friendly habits",
+      "tag": "ecotrack",
+      "ms_ac_template": "/widgets/ecotrack-template.json",
+      "data": "/widgets/ecotrack-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/widgets/screenshot-widget.png",
+          "sizes": "600x400",
+          "label": "The ECOTrack widget showing habit progress"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icon-128x128.png",
+          "sizes": "128x128"
+        }
+      ],
+      "auth": false,
+      "update": 3600,
+      "multiple": true
+    }
   ]
 }

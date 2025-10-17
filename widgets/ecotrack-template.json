@@ -1,0 +1,63 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "ECOTrack Habits",
+      "weight": "Bolder",
+      "size": "Medium",
+      "color": "Accent"
+    },
+    {
+      "type": "TextBlock",
+      "text": "Today's Progress",
+      "weight": "Default",
+      "size": "Small",
+      "spacing": "Small"
+    },
+    {
+      "type": "FactSet",
+      "facts": [
+        {
+          "title": "Water Saved:",
+          "value": "${waterSaved}L"
+        },
+        {
+          "title": "CO2 Reduced:",
+          "value": "${co2Reduced}kg"
+        },
+        {
+          "title": "Trees Planted:",
+          "value": "${treesPlanted}"
+        }
+      ],
+      "spacing": "Medium"
+    },
+    {
+      "type": "ProgressBar",
+      "id": "progressBar",
+      "title": "Daily Goal",
+      "value": "${progress}",
+      "spacing": "Medium"
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Execute",
+          "title": "Log Habit",
+          "verb": "logHabit",
+          "style": "positive"
+        },
+        {
+          "type": "Action.Execute",
+          "title": "View Details",
+          "verb": "viewDetails"
+        }
+      ],
+      "spacing": "Large"
+    }
+  ],
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json"
+}
