@@ -1,13 +1,14 @@
-import sqlite3
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask import g
 
-DATABASE = 'ecotrack.db'
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-        db.row_factory = sqlite3.Row  # Permite acceder a las columnas por nombre
+        db = g._database = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
     return db
 
 def init_db():
@@ -17,10 +18,10 @@ def init_db():
     # 1. Tabla de Usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            email TEXT UNIQUE NOT NULL,
+            id SERIAL PRIMARY KEY,
+            email VARCHAR(255) UNIQUE NOT NULL,
             password TEXT NOT NULL,
-            username TEXT,
+            username VARCHAR(255),
             points INTEGER DEFAULT 0,
             co2_saved REAL DEFAULT 0.0
         )
@@ -29,41 +30,38 @@ def init_db():
     # 2. Tabla de Hábitos (Registros de acciones)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS habits (
-            id INTEGER PRIMARY KEY,
-            user_id INTEGER,
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users (id),
             action TEXT NOT NULL,
             notes TEXT,
             co2_impact REAL NOT NULL,
             points_awarded INTEGER NOT NULL,
-            date TEXT NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users (id)
+            date DATE NOT NULL
         )
     ''')
 
     # 3. Tabla de Retos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS challenges (
-            id INTEGER PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             title TEXT NOT NULL,
             description TEXT NOT NULL,
             reward_points INTEGER NOT NULL,
             target_type TEXT NOT NULL,
             target_value INTEGER NOT NULL,
-            start_date TEXT NOT NULL,
-            end_date TEXT NOT NULL
+            start_date DATE NOT NULL,
+            end_date DATE NOT NULL
         )
     ''')
 
     # 4. Tabla de Progreso de Retos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_challenges (
-            id INTEGER PRIMARY KEY,
-            user_id INTEGER,
-            challenge_id INTEGER,
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER REFERENCES users (id),
+            challenge_id INTEGER REFERENCES challenges (id),
             progress_value INTEGER DEFAULT 0,
             completed INTEGER DEFAULT 0,
-            FOREIGN KEY (user_id) REFERENCES users (id),
-            FOREIGN KEY (challenge_id) REFERENCES challenges (id),
             UNIQUE(user_id, challenge_id)
         )
     ''')
@@ -87,7 +85,7 @@ def init_challenges():
 
     # Verificar si hay retos para evitar duplicados
     cursor.execute('SELECT COUNT(*) FROM challenges')
-    if cursor.fetchone()[0] == 0:
+    if cursor.fetchone()['count'] == 0:
         cursor.executemany('''
             INSERT INTO challenges (title, description, reward_points, target_type, target_value, start_date, end_date)
             VALUES (?, ?, ?, ?, ?, ?, ?)
