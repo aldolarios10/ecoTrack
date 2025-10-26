@@ -8,6 +8,76 @@ let state = {
     challengeData: [],
     rankingData: []
 };
+const mockData = {
+  login: { token: "mock-token-123" },
+  register: { message: "User registered successfully" },
+  dashboard: {
+    user: { username: "MockUser", email: "mock@example.com" },
+    summary: { actions: 15, points: 250, co2_saved: 12.5 },
+    achievements: [
+      { name: "Primer Paso", desc: "Registraste tu primer hábito", icon: "🌱" },
+      { name: "Reciclador", desc: "Reciclaste 10 veces", icon: "♻️" }
+    ],
+    progress_chart: [
+      { day: "Lun", co2: 2.1, points: 30 },
+      { day: "Mar", co2: 1.8, points: 25 },
+      { day: "Mié", co2: 2.5, points: 35 },
+      { day: "Jue", co2: 1.2, points: 20 },
+      { day: "Vie", co2: 3.0, points: 40 },
+      { day: "Sáb", co2: 2.7, points: 38 },
+      { day: "Dom", co2: 1.9, points: 28 }
+    ]
+  },
+  habits: { points: 10, co2: 1.5 },
+  challenges: [
+    {
+      id: 1,
+      title: "Recicla 5 veces",
+      description: "Recicla al menos 5 artículos de plástico esta semana.",
+      progress: 3,
+      target_value: 5,
+      percentage: 60,
+      completed: 0,
+      reward_points: 50
+    },
+    {
+      id: 2,
+      title: "Usa transporte sostenible",
+      description: "Camina o usa bicicleta para 10 viajes.",
+      progress: 7,
+      target_value: 10,
+      percentage: 70,
+      completed: 0,
+      reward_points: 75
+    },
+    {
+      id: 3,
+      title: "Ahorra agua",
+      description: "Toma duchas de menos de 5 minutos por 7 días.",
+      progress: 5,
+      target_value: 7,
+      percentage: 71,
+      completed: 0,
+      reward_points: 60
+    }
+  ],
+  challengesComplete: { message: "¡Reto completado! Has ganado puntos extra." },
+  ranking: {
+    ranking: [
+      { position: 1, username: "EcoHero", points: 500, co2_saved: 25.0 },
+      { position: 2, username: "GreenWarrior", points: 450, co2_saved: 22.5 },
+      { position: 3, username: "PlanetSaver", points: 400, co2_saved: 20.0 },
+      { position: 4, username: "EcoFriendly", points: 350, co2_saved: 17.5 },
+      { position: 5, username: "MockUser", points: 250, co2_saved: 12.5 },
+      { position: 6, username: "NatureLover", points: 200, co2_saved: 10.0 },
+      { position: 7, username: "Sustainable", points: 150, co2_saved: 7.5 },
+      { position: 8, username: "EcoAdvocate", points: 100, co2_saved: 5.0 },
+      { position: 9, username: "GreenThumb", points: 50, co2_saved: 2.5 },
+      { position: 10, username: "EarthGuardian", points: 25, co2_saved: 1.25 }
+    ],
+    personal_rank: { rank: 5, points: 250 }
+  }
+};
 
 // --- Helpers de UI ---
 
@@ -40,44 +110,51 @@ function toggleSidebar() {
     overlay.classList.toggle('hidden');
 }
 
-// --- Lógica de Peticiones API ---
+// --- Lógica de Peticiones API (Mock) ---
 
 async function apiFetch(endpoint, method = 'GET', data = null) {
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-    if (state.token) {
-        headers['Authorization'] = `Bearer ${state.token}`;
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Mock authentication check for protected endpoints
+    if (endpoint !== '/login' && endpoint !== '/register' && !state.token) {
+        throw new Error('No authentication token provided');
     }
 
-    const config = {
-        method: method,
-        headers: headers,
-    };
-
-    if (data) {
-        config.body = JSON.stringify(data);
-    }
-
-    try {
-        const response = await fetch(`${BASE_URL}${endpoint}`, config);
-        const result = await response.json();
-
-        if (response.status === 401) {
-            // Si la sesión expira o no es válida, redirige a login
-            console.error("API Error: 401 Unauthorized. Token might be invalid or expired.");
-            handleLogout();
+    // Mock responses based on endpoint
+    if (endpoint === '/login') {
+        // Always allow login
+        return mockData.login;
+    } else if (endpoint === '/register') {
+        // Always allow register
+        return mockData.register;
+    } else if (endpoint === '/dashboard') {
+        return mockData.dashboard;
+    } else if (endpoint === '/habits') {
+        // For POST, update local state if needed
+        if (method === 'POST') {
+            // Simulate adding points to summary
+            mockData.dashboard.summary.actions += 1;
+            mockData.dashboard.summary.points += mockData.habits.points;
+            mockData.dashboard.summary.co2_saved += mockData.habits.co2;
         }
-
-        if (!response.ok) {
-            // Manejo de errores de la API (e.g., 400, 409, 500)
-            throw new Error(result.message || `Error en la API: ${response.status}`);
+        return mockData.habits;
+    } else if (endpoint === '/challenges') {
+        return mockData.challenges;
+    } else if (endpoint === '/challenges/complete') {
+        // Update challenge status
+        const challengeId = data.challenge_id;
+        const challenge = mockData.challenges.find(c => c.id === challengeId);
+        if (challenge) {
+            challenge.completed = 1;
+            // Add reward points
+            mockData.dashboard.summary.points += challenge.reward_points;
         }
-
-        return result;
-    } catch (error) {
-        console.error('API Error:', error);
-        throw error;
+        return mockData.challengesComplete;
+    } else if (endpoint === '/ranking') {
+        return mockData.ranking;
+    } else {
+        throw new Error(`Unknown endpoint: ${endpoint}`);
     }
 }
 
@@ -122,13 +199,15 @@ async function handleRegister(e) {
     const password = document.getElementById('register-password').value;
 
     try {
-        const result = await apiFetch('/register', 'POST', { email, password });
+        // const result = await apiFetch('/register', 'POST', { email, password });
+        // Mock: Always succeed and set token
+        state.token = mockData.login.token;
+        localStorage.setItem('ecoTrackToken', state.token);
+        state.user = mockData.dashboard.user;
 
-        showModal('Registro Exitoso', 'Tu cuenta ha sido creada. ¡Inicia sesión ahora!');
-        // Redirige al formulario de login
-        document.getElementById('auth-card-title').textContent = 'Iniciar Sesión';
-        document.getElementById('login-form-container').classList.remove('hidden');
-        document.getElementById('register-form-container').classList.add('hidden');
+        showModal('Registro Exitoso', 'Tu cuenta ha sido creada. ¡Bienvenido!');
+        // Directly render dashboard after registration
+        renderView('dashboard');
     } catch (error) {
         showModal('Error de Registro', error.message);
     }
